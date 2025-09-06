@@ -1,0 +1,40 @@
+# Node
+node_modules/
+
+# Next.js
+.next/
+
+# Turborepo
+.turbo/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+
+# Env
+.env*
+
+# VSCode
+# .vscode/
+
+# Build
+/dist/
+.next/
+out/
+build
+
+# Yarn/PNPM
+.pnp*
+
+# Coverage
+coverage/
+
+# Others
+*.local
+
+# Optional: Ignore lock files if desired
+# pnpm-lock.yaml
+# yarn.lock
+# package-lock.json

@@ -1,0 +1,26 @@
+{
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+  "source.fixAll": "always",
+  "source.organizeImports": "always"
+  },
+  "files.exclude": {
+    "**/.next": true,
+    "**/node_modules": true,
+    "**/.turbo": true
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "eslint.enable": true,
+  "eslint.packageManager": "pnpm",
+  "eslint.workingDirectories": [
+    { "mode": "auto" }
+  ],
+  "prettier.requireConfig": true,
+  "search.exclude": {
+    "**/.next": true,
+    "**/node_modules": true,
+    "**/.turbo": true
+  },
+  "turbo.runOnSave": true,
+  "turbo.showTaskStatus": true
+}
