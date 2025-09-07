@@ -35,6 +35,20 @@ The application path is not writable, please check folder permissions and try ag
 It is likely you do not have write permissions for this folder.
 ```
 
+## add UI shadcn
+
+<https://ui.shadcn.com/docs/installation/manual>
+
+```sh
+mkdir packages/ui 
+cd packages/ui 
+pnpm add class-variance-authority clsx tailwind-merge lucide-react tw-animate-css
+```
+
+```sh
+pnpm dlx shadcn@latest add --all
+```
+
 ```sh
 pnpm create next-app@latest apps/be
 pnpm create next-app@latest apps/cp
