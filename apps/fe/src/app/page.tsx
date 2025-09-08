@@ -1,12 +1,21 @@
-import { Button } from "@workspace/ui/components/button"
+import CTASection from "@/components/CTASection";
+import FAQSection from "@/components/FAQSection";
+import FeaturesSection from "@/components/FeaturesSection";
+import FooterSection from "@/components/FooterSection";
+import HeaderSection from "@/components/HeaderSection";
+import HeroSection from "@/components/HeroSection";
+import ProcessSteps from "@/components/ProcessSteps";
 
 export default function Page() {
   return (
-    <div className="flex items-center justify-center min-h-svh">
-      <div className="flex flex-col items-center justify-center gap-4">
-        <h1 className="text-2xl font-bold">Integrate Shadcn UI</h1>
-        <Button>Button</Button>
-      </div>
-    </div>
-  )
+    <main className="min-h-svh flex flex-col">
+      <HeaderSection isLoggedIn={true} />
+      <HeroSection />
+      <ProcessSteps />
+      <CTASection />
+      <FeaturesSection />
+      <FAQSection />
+      <FooterSection />
+    </main>
+  );
 }
