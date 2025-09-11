@@ -1,3 +1,4 @@
+import SchoolBrowser from "@/components/SchoolBrowser";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { useEffect } from "react";
@@ -30,6 +31,9 @@ export function SekolahForm({ onNext, onPrev, sekolahOptions, tahunAjaranOptions
         <div className="max-w-2xl mx-auto">
             <div className="bg-card border border-border rounded-2xl shadow-lg p-8 mb-8">
                 <h2 className="text-2xl font-bold text-primary mb-6">Formulir Sekolah Tujuan</h2>
+
+                <SchoolBrowser />
+
                 <form onSubmit={handleSubmit(onNext)}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="flex flex-col gap-1">

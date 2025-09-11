@@ -1,24 +1,29 @@
 {
-    "name": "@workspace/db",
+    "name": "@workspace/database",
     "version": "0.1.0",
+    "exports": {
+        ".": "./src/index.ts",
+        "./*": "./src/*.ts",
+        "./data/*": "./src/data/*.ts"
+    },
     "scripts": {
         "db:generate:spmb": "prisma generate --schema=./prisma/spmb/schema.prisma",
         "db:migrate:spmb": "prisma migrate dev --skip-generate --schema=./prisma/spmb/schema.prisma",
         "db:push:spmb": "prisma db push --schema=./prisma/spmb/schema.prisma",
         "db:seed:spmb": "prisma db seed --schema=./prisma/spmb/schema.prisma",
         "db:reset:spmb": "prisma migrate reset --schema=./prisma/spmb/schema.prisma",
-        "db:deploy:spmb": "prisma migrate deploy --schema=./prisma/spmb/schema.prisma"
+        "db:deploy:spmb": "prisma migrate deploy --schema=./prisma/spmb/schema.prisma",
+        "seed:spmb": "ts-node ./prisma/spmb/seed.ts"
     },
     "devDependencies": {
+        "@faker-js/faker": "^10.0.0",
+        "@types/node": "^24.3.1",
         "@workspace/eslint-config": "workspace:*",
         "@workspace/typescript-config": "workspace:*",
-        "@types/node": "^24.3.1",
-        "prisma": "^6.16.0"
+        "prisma": "^6.16.0",
+        "ts-node": "^10.9.2"
     },
     "dependencies": {
         "@prisma/client": "^6.16.0"
-    },
-    "exports": {
-        ".": "./src/index.ts"
     }
 }

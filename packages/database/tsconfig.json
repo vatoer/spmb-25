@@ -1,0 +1,20 @@
+{
+    "extends": "@workspace/typescript-config/base.json",
+    "compilerOptions": {
+        "baseUrl": "./src",
+        "paths": {
+            "@workspace/database/client-spmb": [
+                "./client-spmb"
+            ]
+        }
+    },
+    "include": [
+        "next-env.d.ts",
+        "**/*.ts",
+        "**/*.tsx",
+        "tsup.config.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}

@@ -16,6 +16,9 @@ node_modules/
 # Env
 .env*
 
+# excep .env.example
+!.env.example
+
 # VSCode
 # .vscode/
 

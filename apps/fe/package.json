@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
+    "@workspace/database": "workspace:*",
     "@workspace/ui": "workspace:*",
     "next": "15.5.2",
     "react": "19.1.0",

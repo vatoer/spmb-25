@@ -3,5 +3,5 @@
 ## run script
 
 ```sh
-pnpm --filter=@workspace/db run db:push:spmb
+pnpm --filter=@workspace/database run db:push:spmb
 ```
