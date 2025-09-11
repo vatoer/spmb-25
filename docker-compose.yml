@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: spmb-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: spmb
+      POSTGRES_USER: spmbuser
+      POSTGRES_PASSWORD: spmbpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+    driver: local

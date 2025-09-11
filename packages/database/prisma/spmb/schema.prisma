@@ -1,0 +1,408 @@
+// Prisma schema generated from ddl.sql
+// You may need to adjust some relations, enums, and types for your specific database
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum status_pendaftaran_enum {
+    BARU
+    MENUNGGU_VERIFIKASI
+    PERLU_PERBAIKAN
+    TERVERIFIKASI
+    DITERIMA
+    CADANGAN
+    DITOLAK
+    DAFTAR_ULANG
+    MENGUNDURKAN_DIRI
+}
+
+enum status_verifikasi_enum {
+    MENUNGGU_VERIFIKASI
+    VALID
+    TIDAK_VALID
+    PERBAIKAN
+}
+
+enum status_pembayaran_enum {
+    PENDING
+    SUCCESS
+    FAILED
+    EXPIRED
+    REFUNDED
+}
+
+enum status_tagihan_enum {
+    BELUM_LUNAS
+    LUNAS
+    JATUH_TEMPO
+}
+
+enum status_langganan_enum {
+    AKTIF
+    TIDAK_AKTIF
+    UJI_COBA
+    MENUNGGU
+    GANTI_PAKET
+    DIBLOKIR
+    DITANGGUHKAN
+    KADALUARSA
+}
+
+enum jenis_alamat_enum {
+    DOMISILI_KK
+    TINGGAL_SKD // surat keterangan domisili
+    TINGGAL_PESANTREN
+    TINGGAL_ASRAMA
+    TINGGAL_PANTI_ASUHAN
+}
+
+model wilayah {
+    id                           String    @id @unique // kode_wilayah sebagai primary key
+    nama                         String
+    id_level_wilayah             Int
+    mst_kode_wilayah             Int
+    induk_provinsi               String?
+    kode_wilayah_induk_provinsi  String?
+    induk_kabupaten              String?
+    kode_wilayah_induk_kabupaten String?
+    sekolah                      sekolah[]
+    alamat                       alamat[]
+}
+
+model sekolah {
+    id                String           @id @default(uuid())
+    npsn              String           @unique
+    nama_sekolah      String
+    bentuk_pendidikan String?
+    status_sekolah    String?
+    alamat_jalan      String?
+    desa_kelurahan    String?
+    kecamatan         String?
+    kabupaten_kota    String?
+    provinsi          String?
+    kode_pos          String?
+    email             String?
+    website           String?
+    wilayah_id        String?
+    latitude          Float?
+    longitude         Float?
+    created_at        DateTime         @default(now())
+    updated_at        DateTime         @default(now())
+    wilayah           wilayah?         @relation(fields: [wilayah_id], references: [id])
+    kuota_jalur       kuota_jalur[]
+    komponen_biaya    komponen_biaya[]
+    tagihan           tagihan[]
+    kupon_diskon      kupon_diskon[]
+    pendaftaran       pendaftaran[]
+    calon_murid_asal  calon_murid[]
+}
+
+model tahun_ajaran {
+    id                   Int                    @id @default(autoincrement())
+    tahun_mulai          Int
+    tahun_selesai        Int
+    nama_tahun_ajaran    String
+    is_active            Boolean                @default(false)
+    gelombang_penerimaan gelombang_penerimaan[]
+    kuota_jalur          kuota_jalur[]
+    komponen_biaya       komponen_biaya[]
+    tagihan              tagihan[]
+    pendaftaran          pendaftaran[]
+}
+
+model gelombang_penerimaan {
+    id              Int           @id @default(autoincrement())
+    tahun_ajaran_id Int
+    nama_gelombang  String
+    tanggal_mulai   DateTime
+    tanggal_selesai DateTime
+    created_at      DateTime      @default(now())
+    tahun_ajaran    tahun_ajaran  @relation(fields: [tahun_ajaran_id], references: [id])
+    pendaftaran     pendaftaran[]
+}
+
+model jalur_seleksi {
+    id           Int            @id @default(autoincrement())
+    kode_jalur   String         @unique
+    nama_jalur   String
+    deskripsi    String?
+    kuota_jalur  kuota_jalur[]
+    syarat_jalur syarat_jalur[]
+    pendaftaran  pendaftaran[]
+}
+
+model kuota_jalur {
+    id               Int           @id @default(autoincrement())
+    sekolah_id       String
+    tahun_ajaran_id  Int
+    jalur_seleksi_id Int
+    kuota_persen     Float
+    kuota_absolut    Int?
+    sekolah          sekolah       @relation(fields: [sekolah_id], references: [id])
+    tahun_ajaran     tahun_ajaran  @relation(fields: [tahun_ajaran_id], references: [id])
+    jalur_seleksi    jalur_seleksi @relation(fields: [jalur_seleksi_id], references: [id])
+}
+
+model ref_dokumen {
+    id                Int                 @id @default(autoincrement())
+    kode_dokumen      String              @unique
+    nama_dokumen      String
+    deskripsi         String?
+    syarat_jalur      syarat_jalur[]
+    dokumen_pendaftar dokumen_pendaftar[]
+}
+
+model syarat_jalur {
+    id               Int           @id @default(autoincrement())
+    jalur_seleksi_id Int
+    ref_dokumen_id   Int
+    is_wajib         Boolean       @default(true)
+    catatan          String?
+    jalur_seleksi    jalur_seleksi @relation(fields: [jalur_seleksi_id], references: [id])
+    ref_dokumen      ref_dokumen   @relation(fields: [ref_dokumen_id], references: [id])
+}
+
+model calon_murid {
+    id                     String             @id @default(uuid())
+    nama_lengkap           String
+    jenis_kelamin          String
+    nisn                   String?            @unique
+    nik                    String             @unique
+    nomor_kk               String?
+    tempat_lahir           String
+    tanggal_lahir          DateTime
+    agama                  String?
+    kewarganegaraan        String?            @default("Indonesia (WNI)")
+    kebutuhan_khusus       String?
+    anak_ke                Int?
+    jumlah_saudara_kandung Int?
+    nomor_telepon_hp       String?
+    email                  String?
+    created_at             DateTime           @default(now())
+    updated_at             DateTime           @default(now())
+    deleted_at             DateTime?
+    orang_tua_murid        orang_tua_murid[]
+    alamat                 alamat[]
+    jenis_alamat_tinggal   jenis_alamat_enum?
+    sekolah_asal_id        String?
+    sekolah_asal           sekolah?           @relation(fields: [sekolah_asal_id], references: [id])
+    pendaftaran            pendaftaran[]
+}
+
+model orang_tua {
+    id                  String            @id @default(uuid())
+    nama_lengkap        String
+    nik                 String?
+    tahun_lahir         Int?
+    pendidikan_terakhir String?
+    pekerjaan           String?
+    penghasilan_bulanan String?
+    kebutuhan_khusus    String?
+    nomor_telepon_hp    String?
+    jenis_kelamin       String // harusnya sdh bs diliat dari ktp nya
+    created_at          DateTime          @default(now())
+    updated_at          DateTime          @default(now())
+    orang_tua_murid     orang_tua_murid[]
+}
+
+model orang_tua_murid {
+    id              Int         @id @default(autoincrement())
+    orang_tua_id    String
+    calon_murid_id  String
+    status_hubungan String
+    orang_tua       orang_tua   @relation(fields: [orang_tua_id], references: [id])
+    calon_murid     calon_murid @relation(fields: [calon_murid_id], references: [id])
+}
+
+model alamat {
+    id             String            @id @default(uuid())
+    calon_murid_id String
+    jenis_alamat   jenis_alamat_enum
+    alamat_jalan   String
+    rt             String?
+    rw             String?
+    nama_dusun     String?
+    desa_kelurahan String
+    kecamatan      String
+    kabupaten_kota String
+    provinsi       String
+    kode_pos       String?
+    lintang        Float?
+    bujur          Float?
+    created_at     DateTime          @default(now())
+    updated_at     DateTime          @default(now())
+    wilayah_id     String?
+    calon_murid    calon_murid       @relation(fields: [calon_murid_id], references: [id])
+    wilayah        wilayah?          @relation(fields: [wilayah_id], references: [id])
+}
+
+model pendaftaran {
+    id                       String                    @id @default(uuid())
+    nomor_pendaftaran        String                    @unique
+    user_id                  String
+    calon_murid_id           String
+    sekolah_tujuan_id        String
+    tahun_ajaran_id          Int
+    gelombang_id             Int
+    jalur_seleksi_pilihan_id Int?
+    status_pendaftaran       status_pendaftaran_enum   @default(BARU)
+    tanggal_pendaftaran      DateTime                  @default(now())
+    catatan_pendaftaran      String?
+    is_deleted               Boolean                   @default(false)
+    deleted_at               DateTime?
+    created_by               String?
+    updated_by               String?
+    calon_murid              calon_murid               @relation(fields: [calon_murid_id], references: [id])
+    sekolah_tujuan           sekolah                   @relation(fields: [sekolah_tujuan_id], references: [id])
+    tahun_ajaran             tahun_ajaran              @relation(fields: [tahun_ajaran_id], references: [id])
+    gelombang_penerimaan     gelombang_penerimaan      @relation(fields: [gelombang_id], references: [id])
+    jalur_seleksi            jalur_seleksi?            @relation(fields: [jalur_seleksi_pilihan_id], references: [id])
+    dokumen_pendaftar        dokumen_pendaftar[]
+    tagihan                  tagihan[]
+    penggunaan_kupon_diskon  penggunaan_kupon_diskon[]
+    log_status_pendaftaran   log_status_pendaftaran[]
+}
+
+model dokumen_pendaftar {
+    id                  String                 @id @default(uuid())
+    pendaftaran_id      String
+    ref_dokumen_id      Int
+    nama_file_asli      String
+    path_file           String
+    tipe_file           String?
+    ukuran_file_kb      Int?
+    status_verifikasi   status_verifikasi_enum @default(MENUNGGU_VERIFIKASI)
+    catatan_verifikator String?
+    diunggah_pada       DateTime               @default(now())
+    diverifikasi_pada   DateTime?
+    diverifikasi_oleh   String?
+    tipe_storage        String?
+    versi               Int                    @default(1)
+    is_active           Boolean                @default(true)
+    created_by          String?
+    updated_by          String?
+    pendaftaran         pendaftaran            @relation(fields: [pendaftaran_id], references: [id])
+    ref_dokumen         ref_dokumen            @relation(fields: [ref_dokumen_id], references: [id])
+}
+
+model log_status_pendaftaran {
+    id              Int                      @id @default(autoincrement())
+    pendaftaran_id  String
+    status_lama     status_pendaftaran_enum?
+    status_baru     status_pendaftaran_enum
+    diubah_oleh     String?
+    waktu_perubahan DateTime                 @default(now())
+    catatan         String?
+    pendaftaran     pendaftaran              @relation(fields: [pendaftaran_id], references: [id])
+}
+
+model komponen_biaya {
+    id              Int              @id @default(autoincrement())
+    sekolah_id      String
+    tahun_ajaran_id Int?
+    kode_biaya      String
+    nama_biaya      String
+    jumlah          Float
+    is_wajib        Boolean          @default(true)
+    deskripsi       String?
+    created_by      String?
+    updated_by      String?
+    sekolah         sekolah          @relation(fields: [sekolah_id], references: [id])
+    tahun_ajaran    tahun_ajaran?    @relation(fields: [tahun_ajaran_id], references: [id])
+    detail_tagihan  detail_tagihan[]
+}
+
+model tagihan {
+    id                  String              @id @default(uuid())
+    pendaftaran_id      String
+    nomor_tagihan       String              @unique
+    total_tagihan       Float
+    tanggal_terbit      DateTime
+    tanggal_jatuh_tempo DateTime?
+    status_tagihan      status_tagihan_enum @default(BELUM_LUNAS)
+    tipe_tagihan        String?             @default("REGULER")
+    jadwal_pembayaran   Json?
+    prioritas           Int                 @default(1)
+    created_at          DateTime            @default(now())
+    created_by          String?
+    updated_by          String?
+    sekolah_id          String?
+    sekolah             sekolah?            @relation(fields: [sekolah_id], references: [id])
+    pendaftaran         pendaftaran         @relation(fields: [pendaftaran_id], references: [id])
+    detail_tagihan      detail_tagihan[]
+    pembayaran          pembayaran[]
+    tahun_ajaran        tahun_ajaran?       @relation(fields: [tahun_ajaranId], references: [id])
+    tahun_ajaranId      Int?
+}
+
+model detail_tagihan {
+    tagihan_id        String
+    komponen_biaya_id Int
+    jumlah            Float
+    tagihan           tagihan        @relation(fields: [tagihan_id], references: [id])
+    komponen_biaya    komponen_biaya @relation(fields: [komponen_biaya_id], references: [id])
+
+    @@id([tagihan_id, komponen_biaya_id])
+}
+
+model pembayaran {
+    id                          String                 @id @default(uuid())
+    tagihan_id                  String
+    nomor_referensi_gateway     String?                @unique
+    metode_pembayaran           String?
+    jumlah_bayar                Float
+    status_pembayaran           status_pembayaran_enum @default(PENDING)
+    waktu_transaksi             DateTime?
+    waktu_penyelesaian          DateTime?
+    created_at                  DateTime               @default(now())
+    deleted_at                  DateTime?
+    fee                         Float?
+    refund_amount               Float?
+    error_message               String?
+    created_by                  String?
+    updated_by                  String?
+    kupon_diskon_id             Int?
+    diskon_persen               Float?
+    diskon_nominal              Float?
+    jumlah_bayar_setelah_diskon Float?
+    tagihan                     tagihan                @relation(fields: [tagihan_id], references: [id])
+    kupon_diskon                kupon_diskon?          @relation(fields: [kupon_diskon_id], references: [id])
+}
+
+model kupon_diskon {
+    id                      Int                       @id @default(autoincrement())
+    sekolah_id              String
+    kode_kupon              String                    @unique
+    nama                    String
+    tipe_diskon             String
+    tipe_kupon              String
+    nilai                   Float
+    tanggal_mulai           DateTime?
+    tanggal_selesai         DateTime?
+    kuota                   Int?
+    aktif                   Boolean                   @default(true)
+    created_at              DateTime                  @default(now())
+    created_by              String?
+    updated_by              String?
+    sekolah                 sekolah                   @relation(fields: [sekolah_id], references: [id])
+    pembayaran              pembayaran[]
+    penggunaan_kupon_diskon penggunaan_kupon_diskon[]
+}
+
+model penggunaan_kupon_diskon {
+    id              Int          @id @default(autoincrement())
+    pendaftaran_id  String
+    kupon_diskon_id Int
+    waktu_digunakan DateTime     @default(now())
+    keterangan      String?
+    created_by      String?
+    updated_by      String?
+    pendaftaran     pendaftaran  @relation(fields: [pendaftaran_id], references: [id])
+    kupon_diskon    kupon_diskon @relation(fields: [kupon_diskon_id], references: [id])
+}

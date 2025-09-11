@@ -1,0 +1,24 @@
+{
+    "name": "@workspace/db",
+    "version": "0.1.0",
+    "scripts": {
+        "db:generate:spmb": "prisma generate --schema=./prisma/spmb/schema.prisma",
+        "db:migrate:spmb": "prisma migrate dev --skip-generate --schema=./prisma/spmb/schema.prisma",
+        "db:push:spmb": "prisma db push --schema=./prisma/spmb/schema.prisma",
+        "db:seed:spmb": "prisma db seed --schema=./prisma/spmb/schema.prisma",
+        "db:reset:spmb": "prisma migrate reset --schema=./prisma/spmb/schema.prisma",
+        "db:deploy:spmb": "prisma migrate deploy --schema=./prisma/spmb/schema.prisma"
+    },
+    "devDependencies": {
+        "@workspace/eslint-config": "workspace:*",
+        "@workspace/typescript-config": "workspace:*",
+        "@types/node": "^24.3.1",
+        "prisma": "^6.16.0"
+    },
+    "dependencies": {
+        "@prisma/client": "^6.16.0"
+    },
+    "exports": {
+        ".": "./src/index.ts"
+    }
+}
