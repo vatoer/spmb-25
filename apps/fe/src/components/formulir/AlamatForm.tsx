@@ -4,6 +4,7 @@ import { Input } from "@workspace/ui/components/input";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
+import WilayahSelect from "../WilayahSelect";
 import { AlamatSchema, AlamatType } from "./schemas";
 
 export function AlamatForm({
@@ -48,6 +49,7 @@ export function AlamatForm({
         formState: { errors },
         reset,
         watch,
+        setValue,
     } = useForm<{ alamat_kk: AlamatType; alamat_tinggal: AlamatType }>({
         resolver: zodResolver(
             z.object({
@@ -121,21 +123,24 @@ export function AlamatForm({
                                 <label className="block font-semibold mb-1 text-muted-foreground">Nama Dusun</label>
                                 <Input {...register("alamat_kk.nama_dusun")} className="w-full" />
                             </div>
-                            <div className="flex flex-col gap-1">
-                                <label className="block font-semibold mb-1 text-muted-foreground">Desa/Kelurahan</label>
-                                <Input {...register("alamat_kk.desa_kelurahan")} required className="w-full" />
-                            </div>
-                            <div className="flex flex-col gap-1">
-                                <label className="block font-semibold mb-1 text-muted-foreground">Kecamatan</label>
-                                <Input {...register("alamat_kk.kecamatan")} required className="w-full" />
-                            </div>
-                            <div className="flex flex-col gap-1">
-                                <label className="block font-semibold mb-1 text-muted-foreground">Kabupaten/Kota</label>
-                                <Input {...register("alamat_kk.kabupaten_kota")} required className="w-full" />
-                            </div>
-                            <div className="flex flex-col gap-1">
-                                <label className="block font-semibold mb-1 text-muted-foreground">Provinsi</label>
-                                <Input {...register("alamat_kk.provinsi")} required className="w-full" />
+                            <div className="flex flex-col gap-1 col-span-2">
+                                <label className="block font-semibold mb-1 text-muted-foreground">Wilayah KK</label>
+                                <WilayahSelect
+                                    initialValue={{
+                                        provinsi: watch("alamat_kk.provinsi"),
+                                        kabupaten: watch("alamat_kk.kabupaten_kota"),
+                                        kecamatan: watch("alamat_kk.kecamatan"),
+                                        kelurahan: watch("alamat_kk.desa_kelurahan"),
+                                    }}
+                                    onChange={wil => {
+                                        if (wil) {
+                                            setValue("alamat_kk.provinsi", wil.provinsi?.nama || "");
+                                            setValue("alamat_kk.kabupaten_kota", wil.kabupaten?.nama || "");
+                                            setValue("alamat_kk.kecamatan", wil.kecamatan?.nama || "");
+                                            setValue("alamat_kk.desa_kelurahan", wil.kelurahan?.nama || "");
+                                        }
+                                    }}
+                                />
                             </div>
                             <div className="flex flex-col gap-1">
                                 <label className="block font-semibold mb-1 text-muted-foreground">Kode Pos</label>
@@ -166,7 +171,8 @@ export function AlamatForm({
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="flex flex-col gap-1">
                                     <label className="block font-semibold mb-1 text-muted-foreground">Jenis Tempat Tinggal</label>
-                                    <select {...register("alamat_tinggal.jenis_alamat")} required className="w-full border rounded-md px-3 py-2 bg-background">
+                                    <select {...register("alamat_tinggal.jenis_alamat")}
+                                        required className="w-full border rounded-md px-3 py-2 bg-background">
                                         <option value="">Pilih</option>
                                         <option value="TINGGAL_SKD">SKD (Surat Keterangan Domisili)</option>
                                         <option value="TINGGAL_PESANTREN">Pesantren</option>
@@ -179,6 +185,10 @@ export function AlamatForm({
                                     <Input {...register("alamat_tinggal.alamat_jalan")} required className="w-full" />
                                 </div>
                                 <div className="flex flex-col gap-1">
+                                    <label className="block font-semibold mb-1 text-muted-foreground">Nama Dusun</label>
+                                    <Input {...register("alamat_tinggal.nama_dusun")} className="w-full" />
+                                </div>
+                                <div className="flex flex-col gap-1">
                                     <label className="block font-semibold mb-1 text-muted-foreground">RT</label>
                                     <Input {...register("alamat_tinggal.rt")} className="w-full" />
                                 </div>
@@ -186,25 +196,24 @@ export function AlamatForm({
                                     <label className="block font-semibold mb-1 text-muted-foreground">RW</label>
                                     <Input {...register("alamat_tinggal.rw")} className="w-full" />
                                 </div>
-                                <div className="flex flex-col gap-1">
-                                    <label className="block font-semibold mb-1 text-muted-foreground">Nama Dusun</label>
-                                    <Input {...register("alamat_tinggal.nama_dusun")} className="w-full" />
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                    <label className="block font-semibold mb-1 text-muted-foreground">Desa/Kelurahan</label>
-                                    <Input {...register("alamat_tinggal.desa_kelurahan")} required className="w-full" />
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                    <label className="block font-semibold mb-1 text-muted-foreground">Kecamatan</label>
-                                    <Input {...register("alamat_tinggal.kecamatan")} required className="w-full" />
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                    <label className="block font-semibold mb-1 text-muted-foreground">Kabupaten/Kota</label>
-                                    <Input {...register("alamat_tinggal.kabupaten_kota")} required className="w-full" />
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                    <label className="block font-semibold mb-1 text-muted-foreground">Provinsi</label>
-                                    <Input {...register("alamat_tinggal.provinsi")} required className="w-full" />
+                                <div className="flex flex-col gap-1 col-span-2">
+                                    <label className="block font-semibold mb-1 text-muted-foreground">Wilayah Tinggal</label>
+                                    <WilayahSelect
+                                        initialValue={{
+                                            provinsi: watch("alamat_tinggal.provinsi"),
+                                            kabupaten: watch("alamat_tinggal.kabupaten_kota"),
+                                            kecamatan: watch("alamat_tinggal.kecamatan"),
+                                            kelurahan: watch("alamat_tinggal.desa_kelurahan"),
+                                        }}
+                                        onChange={wil => {
+                                            if (wil) {
+                                                setValue("alamat_tinggal.provinsi", wil.provinsi?.nama || "");
+                                                setValue("alamat_tinggal.kabupaten_kota", wil.kabupaten?.nama || "");
+                                                setValue("alamat_tinggal.kecamatan", wil.kecamatan?.nama || "");
+                                                setValue("alamat_tinggal.desa_kelurahan", wil.kelurahan?.nama || "");
+                                            }
+                                        }}
+                                    />
                                 </div>
                                 <div className="flex flex-col gap-1">
                                     <label className="block font-semibold mb-1 text-muted-foreground">Kode Pos</label>

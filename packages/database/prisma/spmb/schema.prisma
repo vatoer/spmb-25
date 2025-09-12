@@ -64,16 +64,12 @@ enum jenis_alamat_enum {
 }
 
 model wilayah {
-    id                           String    @id @unique // kode_wilayah sebagai primary key
-    nama                         String
-    id_level_wilayah             Int
-    mst_kode_wilayah             Int
-    induk_provinsi               String?
-    kode_wilayah_induk_provinsi  String?
-    induk_kabupaten              String?
-    kode_wilayah_induk_kabupaten String?
-    sekolah                      sekolah[]
-    alamat                       alamat[]
+    id      String @id @unique // kode_wilayah sebagai primary key
+    nama    String
+    tingkat Int? // 1: Provinsi, 2: Kabupaten/Kota, 3: Kecamatan, 4: Kelurahan/Desa
+
+    sekolah sekolah[]
+    alamat  alamat[]
 }
 
 model sekolah {
