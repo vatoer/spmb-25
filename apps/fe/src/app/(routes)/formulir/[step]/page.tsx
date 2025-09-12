@@ -11,19 +11,19 @@ import { FormulirStepper } from "../stepper";
 
 
 type FormulirData = {
-    biodata?: any;
-    orangTua?: any;
-    alamat?: any;
-    sekolah?: any;
-    dokumen?: any;
-    pembayaran?: any;
+    biodata?: unknown;
+    orangTua?: unknown;
+    alamat?: unknown;
+    sekolah?: unknown;
+    dokumen?: unknown;
+    pembayaran?: unknown;
 };
 
 const useFormulirStore = create(
     persist<{
         data: FormulirData;
         step: number;
-        setStepData: (step: number, value: any) => void;
+        setStepData: (step: number, value: unknown) => void;
         setStep: (step: number) => void;
     }>(
         (set) => ({
@@ -41,10 +41,15 @@ const useFormulirStore = create(
     )
 );
 
+
 const steps = [
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (props: any) => <BiodataForm {...props} defaultValues={useFormulirStore.getState().data.biodata} />,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (props: any) => <OrangTuaForm {...props} defaultValues={useFormulirStore.getState().data.orangTua} />,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (props: any) => <AlamatForm {...props} defaultValues={useFormulirStore.getState().data.alamat} />,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (props: any) => (
         <SekolahForm
             {...props}
@@ -55,6 +60,7 @@ const steps = [
             jalurOptions={[{ label: "Zonasi", value: "ZONASI" }]}
         />
     ),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (props: any) => (
         <DokumenForm
             {...props}
@@ -62,6 +68,7 @@ const steps = [
             dokumenOptions={[{ label: "KK", value: "1" }, { label: "Akta Lahir", value: "2" }]}
         />
     ),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (props: any) => (
         <PembayaranForm
             {...props}
@@ -78,9 +85,9 @@ export default function FormulirStepPage() {
     const setStepData = useFormulirStore(state => state.setStepData);
     const CurrentForm = steps[step];
 
-    const handleNext = (data: any) => {
+    const handleNext = (data: unknown) => {
         setStepData(step, data);
-        console.log("Data saved for step", step, data);
+        console.log("[Page] Data saved for step", step, data);
         if (step < steps.length - 1) setStep(step + 1);
     };
     const handlePrev = () => {

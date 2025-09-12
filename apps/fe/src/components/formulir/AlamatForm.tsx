@@ -2,12 +2,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import z from "zod";
 import WilayahSelect from "../WilayahSelect";
 import { AlamatSchema, AlamatType } from "./schemas";
 
 export function AlamatForm({
+    // Sinkronisasi alamat_tinggal dengan alamat_kk jika checkbox dicentang
     onNext,
     onPrev,
     defaultValues,
@@ -40,9 +41,10 @@ export function AlamatForm({
                 return keys.every(k => kk[k] === tinggal[k]);
             }
         }
-        console.log("Alamat tinggal sama dengan KK:", alamatTinggalSamaKK);
+        // console.log("Alamat tinggal sama dengan KK:", alamatTinggalSamaKK);
         return true;
     });
+
     const {
         register,
         handleSubmit,
@@ -50,6 +52,7 @@ export function AlamatForm({
         reset,
         watch,
         setValue,
+        control
     } = useForm<{ alamat_kk: AlamatType; alamat_tinggal: AlamatType }>({
         resolver: zodResolver(
             z.object({
@@ -63,7 +66,17 @@ export function AlamatForm({
         },
     });
 
+    // Sinkronisasi alamat_tinggal dengan alamat_kk jika checkbox dicentang
+    const alamatKkValue = useWatch({ name: "alamat_kk", control });
     useEffect(() => {
+        if (alamatTinggalSamaKK) {
+            setValue("alamat_tinggal", alamatKkValue);
+            // console.log("copy alamat");
+        }
+    }, [alamatTinggalSamaKK, ...Object.values(alamatKkValue)]);
+
+    useEffect(() => {
+        console.log("defaultValues changed:", defaultValues);
         if (defaultValues) {
             reset({ alamat_kk: defaultValues.alamat_kk, alamat_tinggal: defaultValues.alamat_tinggal });
             // Update centang sesuai data
@@ -97,11 +110,15 @@ export function AlamatForm({
                 <h2 className="text-2xl font-bold text-primary mb-6">Formulir Alamat</h2>
                 <form
                     onSubmit={handleSubmit(data => {
+                        // console.log("Form submitted:", data);
                         if (alamatTinggalSamaKK) {
                             onNext({ alamat_kk: data.alamat_kk, alamat_tinggal: data.alamat_kk });
                         } else {
                             onNext({ alamat_kk: data.alamat_kk, alamat_tinggal: data.alamat_tinggal });
                         }
+                    }, err => {
+                        console.log("Form errors:", err);
+                        // console.log("form data watch ", { alamat_kk: watch("alamat_kk"), alamat_tinggal: watch("alamat_tinggal") });
                     })}
                 >
                     <fieldset className="bg-card border border-border rounded-xl shadow-sm p-6 mb-6">
@@ -127,17 +144,18 @@ export function AlamatForm({
                                 <label className="block font-semibold mb-1 text-muted-foreground">Wilayah KK</label>
                                 <WilayahSelect
                                     initialValue={{
-                                        provinsi: watch("alamat_kk.provinsi"),
-                                        kabupaten: watch("alamat_kk.kabupaten_kota"),
-                                        kecamatan: watch("alamat_kk.kecamatan"),
-                                        kelurahan: watch("alamat_kk.desa_kelurahan"),
+                                        provinsi: defaultValues?.alamat_kk?.provinsi,
+                                        kabupaten: defaultValues?.alamat_kk?.kabupaten_kota,
+                                        kecamatan: defaultValues?.alamat_kk?.kecamatan,
+                                        kelurahan: defaultValues?.alamat_kk?.desa_kelurahan,
                                     }}
                                     onChange={wil => {
+                                        // console.log("Wilayah KK changed:", wil);
                                         if (wil) {
-                                            setValue("alamat_kk.provinsi", wil.provinsi?.nama || "");
-                                            setValue("alamat_kk.kabupaten_kota", wil.kabupaten?.nama || "");
-                                            setValue("alamat_kk.kecamatan", wil.kecamatan?.nama || "");
-                                            setValue("alamat_kk.desa_kelurahan", wil.kelurahan?.nama || "");
+                                            setValue("alamat_kk.provinsi", wil.provinsi?.id || "");
+                                            setValue("alamat_kk.kabupaten_kota", wil.kabupaten?.id || "");
+                                            setValue("alamat_kk.kecamatan", wil.kecamatan?.id || "");
+                                            setValue("alamat_kk.desa_kelurahan", wil.kelurahan?.id || "");
                                         }
                                     }}
                                 />
@@ -200,17 +218,17 @@ export function AlamatForm({
                                     <label className="block font-semibold mb-1 text-muted-foreground">Wilayah Tinggal</label>
                                     <WilayahSelect
                                         initialValue={{
-                                            provinsi: watch("alamat_tinggal.provinsi"),
-                                            kabupaten: watch("alamat_tinggal.kabupaten_kota"),
-                                            kecamatan: watch("alamat_tinggal.kecamatan"),
-                                            kelurahan: watch("alamat_tinggal.desa_kelurahan"),
+                                            provinsi: defaultValues?.alamat_tinggal?.provinsi,
+                                            kabupaten: defaultValues?.alamat_tinggal?.kabupaten_kota,
+                                            kecamatan: defaultValues?.alamat_tinggal?.kecamatan,
+                                            kelurahan: defaultValues?.alamat_tinggal?.desa_kelurahan,
                                         }}
                                         onChange={wil => {
                                             if (wil) {
-                                                setValue("alamat_tinggal.provinsi", wil.provinsi?.nama || "");
-                                                setValue("alamat_tinggal.kabupaten_kota", wil.kabupaten?.nama || "");
-                                                setValue("alamat_tinggal.kecamatan", wil.kecamatan?.nama || "");
-                                                setValue("alamat_tinggal.desa_kelurahan", wil.kelurahan?.nama || "");
+                                                setValue("alamat_tinggal.provinsi", wil.provinsi?.id || "");
+                                                setValue("alamat_tinggal.kabupaten_kota", wil.kabupaten?.id || "");
+                                                setValue("alamat_tinggal.kecamatan", wil.kecamatan?.id || "");
+                                                setValue("alamat_tinggal.desa_kelurahan", wil.kelurahan?.id || "");
                                             }
                                         }}
                                     />

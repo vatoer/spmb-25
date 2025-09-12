@@ -49,7 +49,7 @@ export function PembayaranForm({ onNext, onPrev, metodeOptions, kuponOptions, de
                         <div className="flex flex-col gap-1">
                             <label className="block font-semibold mb-1 text-muted-foreground">Upload Bukti Pembayaran</label>
                             <input type="file" {...register("bukti_pembayaran")} required className="w-full border rounded-md px-3 py-2 bg-background" />
-                            {errors.bukti_pembayaran && <span className="text-destructive text-xs mt-1 block">{errors.bukti_pembayaran.message}</span>}
+                            {errors.bukti_pembayaran && <span className="text-destructive text-xs mt-1 block">{errors.bukti_pembayaran?.message?.toString()}</span>}
                         </div>
                     </div>
                     <div className="md:col-span-2 flex justify-end mt-8 gap-3">

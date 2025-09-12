@@ -58,4 +58,5 @@ export function DokumenForm({ onNext, onPrev, dokumenOptions, defaultValues }: {
                 </form>
             </div>
         </div>
-    );
+    )
+};

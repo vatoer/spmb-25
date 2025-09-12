@@ -6,8 +6,19 @@
       "outputs": []
     },
     "build": {
-      "outputs": [".next/**", "dist/**"],
-      "dependsOn": ["^build"]
+      "outputs": [
+        ".next/**",
+        "dist/**"
+      ],
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "start": {
+      "outputs": [],
+      "dependsOn": [
+        "build"
+      ]
     },
     "lint": {
       "outputs": []

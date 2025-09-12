@@ -73,8 +73,13 @@ export type DokumenType = z.infer<typeof DokumenSchema>;
 export const PembayaranSchema = z.object({
     metode_pembayaran: z.string(),
     kupon_diskon_id: z.string().optional(),
-    jumlah_bayar: z.coerce.number(),
+    jumlah_bayar: z.number(),
+    nomor_rekening: z.string().optional(),
+    nama_bank: z.string().optional(),
+    atas_nama: z.string().optional(),
+    bukti_pembayaran: z.any().optional(),
 });
+
 export type PembayaranType = z.infer<typeof PembayaranSchema>;
 
 export const SekolahAsalSchema = z.object({

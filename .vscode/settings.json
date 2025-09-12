@@ -1,8 +1,9 @@
 {
+  "editor.wordWrap": "on",
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-  "source.fixAll": "always",
-  "source.organizeImports": "always"
+    "source.fixAll": "always",
+    "source.organizeImports": "always"
   },
   "files.exclude": {
     "**/.next": true,
@@ -13,7 +14,9 @@
   "eslint.enable": true,
   "eslint.packageManager": "pnpm",
   "eslint.workingDirectories": [
-    { "mode": "auto" }
+    {
+      "mode": "auto"
+    }
   ],
   "prettier.requireConfig": true,
   "search.exclude": {

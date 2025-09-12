@@ -26,29 +26,63 @@ export default function WilayahSelect({ initialValue, onChange }: {
     const [selectedKecamatan, setSelectedKecamatan] = useState<string>(initialValue?.kecamatan || "");
     const [selectedKelurahan, setSelectedKelurahan] = useState<string>(initialValue?.kelurahan || "");
 
-    // When initialValue changes (e.g. after form reset), update selected values
-    // Only set state from initialValue if initialValue changes and is different from current selection
-    // Only set state from initialValue if initialValue changes and is different from current selection
-    useEffect(() => {
-        if (initialValue && !userSelectedProvinsiRef.current) {
-            const isInitial =
-                initialValue.provinsi !== selectedProvinsi ||
-                initialValue.kabupaten !== selectedKabupaten ||
-                initialValue.kecamatan !== selectedKecamatan ||
-                initialValue.kelurahan !== selectedKelurahan;
-            if (isInitial) {
-                setSelectedProvinsi(initialValue.provinsi || "");
-                setSelectedKabupaten(initialValue.kabupaten || "");
-                setSelectedKecamatan(initialValue.kecamatan || "");
-                setSelectedKelurahan(initialValue.kelurahan || "");
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [initialValue?.provinsi, initialValue?.kabupaten, initialValue?.kecamatan, initialValue?.kelurahan]);
 
     useEffect(() => {
         fetchProvinsi().then(setProvinsi);
+        console.log('[WilayahSelect] fetchProvinsi dijalankan');
     }, []);
+
+    useEffect(() => {
+        console.log('initialValue changed:', initialValue);
+    }, [initialValue]);
+
+    // Ketika initialValue berubah, fetch data berantai dan set state dropdown sesuai data tersimpan
+    useEffect(() => {
+        let isMounted = true;
+        // console.log('[WilayahSelect] initialValue berubah:', initialValue);
+        // console.log('[WilayahSelect] provinsi saat ini:', provinsi);
+        async function fetchWilayahInitial() {
+            if (initialValue &&
+                initialValue.provinsi &&
+                provinsi.length > 0 &&
+                !userSelectedProvinsiRef.current && provinsi.length > 0 // pastikan provinsi sudah di-fetch
+            ) {
+                // console.log('fetchWilayahInitial initialValue:', initialValue);
+                setSelectedProvinsi(initialValue.provinsi || "");
+                if (initialValue.provinsi) {
+                    const kab = await fetchKabupaten(initialValue.provinsi);
+                    // console.log('fetchWilayahInitial kabupaten:', kab);
+                    if (isMounted) setKabupaten(kab);
+                }
+                setSelectedKabupaten(initialValue.kabupaten || "");
+                if (initialValue.kabupaten) {
+                    const kec = await fetchKecamatan(initialValue.kabupaten);
+                    // console.log('fetchWilayahInitial kecamatan:', kec);
+                    if (isMounted) setKecamatan(kec);
+                }
+                setSelectedKecamatan(initialValue.kecamatan || "");
+                if (initialValue.kecamatan) {
+                    const kel = await fetchKelurahan(initialValue.kecamatan);
+                    // console.log('fetchWilayahInitial kelurahan:', kel);
+                    if (isMounted) setKelurahan(kel);
+                }
+                setSelectedKelurahan(initialValue.kelurahan || "");
+                // Setelah initialValue diproses, blok efek ini agar tidak overwrite interaksi user
+                userSelectedProvinsiRef.current = true;
+
+                onChange && onChange({
+                    provinsi: provinsi.find(p => p.id === initialValue.provinsi),
+                    kabupaten: kabupaten.find(k => k.id === initialValue.kabupaten),
+                    kecamatan: kecamatan.find(kec => kec.id === initialValue.kecamatan),
+                    kelurahan: kelurahan.find(kel => kel.id === initialValue.kelurahan),
+                });
+            } else {
+                console.log('[WilayahSelect] Melewati pemrosesan initialValue karena kondisi tidak terpenuhi.', initialValue, userSelectedProvinsiRef.current, provinsi.length);
+            }
+        }
+        fetchWilayahInitial();
+        return () => { isMounted = false; };
+    }, [provinsi, initialValue?.provinsi, initialValue?.kabupaten, initialValue?.kecamatan, initialValue?.kelurahan]);
 
     // Track previous provinsi to only reset if provinsi actually changes
     const prevProvinsiRef = useRef<string>("");
@@ -84,13 +118,15 @@ export default function WilayahSelect({ initialValue, onChange }: {
     }, [selectedKecamatan]);
 
     useEffect(() => {
+        const wilayahLog = {
+            provinsi: provinsi.find(p => p.id === selectedProvinsi),
+            kabupaten: kabupaten.find(k => k.id === selectedKabupaten),
+            kecamatan: kecamatan.find(kec => kec.id === selectedKecamatan),
+            kelurahan: kelurahan.find(kel => kel.id === selectedKelurahan),
+        };
+        // console.log('[WilayahSelect] Wilayah tersimpan:', wilayahLog);
         if (onChange) {
-            onChange({
-                provinsi: provinsi.find(p => p.id === selectedProvinsi),
-                kabupaten: kabupaten.find(k => k.id === selectedKabupaten),
-                kecamatan: kecamatan.find(kec => kec.id === selectedKecamatan),
-                kelurahan: kelurahan.find(kel => kel.id === selectedKelurahan),
-            });
+            onChange(wilayahLog);
         }
     }, [selectedProvinsi, selectedKabupaten, selectedKecamatan, selectedKelurahan]);
 
